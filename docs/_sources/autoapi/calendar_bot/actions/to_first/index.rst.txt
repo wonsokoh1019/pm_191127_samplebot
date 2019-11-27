@@ -1,0 +1,17 @@
+:mod:`calendar_bot.actions.to_first`
+====================================
+
+.. py:module:: calendar_bot.actions.to_first
+
+
+Module Contents
+---------------
+
+.. data:: LOGGER
+   
+
+   
+
+.. function:: to_first(account_id, _, __, ___)
+
+
