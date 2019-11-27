@@ -1,0 +1,611 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Procfile &#8212; calendar_bot  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="procfile">
+<h1>Procfile<a class="headerlink" href="#procfile" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://devcenter.heroku.com/articles/procfile">https://devcenter.heroku.com/articles/procfile</a>:</p>
+<blockquote>
+<div><p>Heroku apps include a Procfile that specifies the commands that are executed by the app on startup. You can use a Procfile to declare a variety of process types, including:</p>
+<ul class="simple">
+<li><p>Your app’s web server</p></li>
+<li><p>Multiple types of worker processes</p></li>
+<li><p>A singleton process, such as a clock</p></li>
+<li><p>Tasks to run before a new release is deployed</p></li>
+</ul>
+</div></blockquote>
+<p>This bot’s Procfile:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Procfile</span><a class="headerlink" href="#id1" title="Permalink to this code">¶</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>release: python scripts/initialize.py
+web: python main.py --port=$PORT
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="initialize-environment">
+<h1>Initialize environment<a class="headerlink" href="#initialize-environment" title="Permalink to this headline">¶</a></h1>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">scripts/initialize.py</span><a class="headerlink" href="#id2" title="Permalink to this code">¶</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;./&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">calendar_bot.initDB</span> <span class="k">import</span> <span class="n">init_db</span>
+<span class="kn">from</span> <span class="nn">calendar_bot.registerBot</span> <span class="k">import</span> <span class="n">init_bot</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">init_db</span><span class="p">()</span>
+    <span class="n">init_bot</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="initialize-database">
+<h2>Initialize database<a class="headerlink" href="#initialize-database" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.initDB.</code><code class="sig-name descname">init_db</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Initialize the data structure.</p>
+<p>Table list:</p>
+<ul class="simple">
+<li><p>bot_calendar_record</p></li>
+<li><p>system_init_status</p></li>
+<li><p>bot_process_status</p></li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.initDB.</code><code class="sig-name descname">create_calendar_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>create calendar table.
+Save the user’s check-in and check-out schedule information.</p>
+<p>columns:</p>
+<ul class="simple">
+<li><p>schedule_id: Schedule id, The bot will create a daily schedule for each user who sign in and out.</p></li>
+<li><p>account: user account id.</p></li>
+<li><p>cur_date: current date by local time.</p></li>
+<li><p>begin_time: schedule begin time.</p></li>
+<li><p>end_time: schedule end time.</p></li>
+<li><p>create_time：record creation time.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.initDB.</code><code class="sig-name descname">create_init_status_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>create init status table, Save system initialization information(register bot,
+register rich menu, create calender).</p>
+<p>columns:</p>
+<ul class="simple">
+<li><p>action：Initialized item (bot no, rich menu, calender id, …),</p></li>
+<li><p>extra: Initialized data or status,</p></li>
+<li><p>create_time: record creation time</p></li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.initDB.</code><code class="sig-name descname">create_process_status_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>create status tables. Save user’s status information.</p>
+<p>type:</p>
+<ul class="simple">
+<li><p>m_status: Is a enum type value，</p>
+<ul>
+<li><p>wait_in: Waiting for the user to enter the check-in time status.</p></li>
+<li><p>in_done: User input check-in time completed.</p></li>
+<li><p>wait_out: Waiting for the user to enter the check-out time status.</p></li>
+<li><p>out_done: User input check-out time completed.</p></li>
+</ul>
+</li>
+<li><p>m_process: Is a enum type value</p>
+<ul>
+<li><p>sign_in_done： Check-in operation completed。</p></li>
+<li><p>sign_out_done： Check-out operation completed。</p></li>
+</ul>
+</li>
+</ul>
+<p>If the type already exists, the duplicateobject exception will be thrown.</p>
+<p>bot_process_status table columns:</p>
+<ul class="simple">
+<li><p>account: user account id,</p></li>
+<li><p>cur_date: current date by local time,</p></li>
+<li><p>status：is m_status value,</p></li>
+<li><p>process: is m_process value,</p></li>
+<li><p>create_time: record creation time</p></li>
+</ul>
+</dd></dl>
+
+</div>
+<div class="section" id="register-bot">
+<h2>Register bot<a class="headerlink" href="#register-bot" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.registerBot.</code><code class="sig-name descname">init_bot</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Initialize bot info. If the BOT is not registered, the system will fail to start.</p>
+<p>Before BOT registration,
+the system_init_status table will be queried.
+If BOT has been registered, it does not need to be re registered.
+Otherwise, the bot will be saved in the system init status table after success,
+indicating that the registration of BOT has been completed during initialization.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.registerBot.</code><code class="sig-name descname">register_bot</code><span class="sig-paren">(</span><em class="sig-param">photo_address</em><span class="sig-paren">)</span></dt>
+<dd><p>Register a message bot.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/1005002?lang=en">https://developers.worksmobile.com/jp/document/1005002?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>photo_address</strong> – Access address of user’s Avatar,
+If you need to change the user image,
+please replace the corresponding file in the image/, Only PNG file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>bot no</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.registerBot.</code><code class="sig-name descname">register_bot_domain</code><span class="sig-paren">(</span><em class="sig-param">bot_no</em><span class="sig-paren">)</span></dt>
+<dd><p>Register a message bot domain.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/1005004?lang=en">https://developers.worksmobile.com/jp/document/1005004?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>bot_no</strong> – bot no</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="run-bot">
+<h1>Run bot<a class="headerlink" href="#run-bot" title="Permalink to this headline">¶</a></h1>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">main.py</span><a class="headerlink" href="#id3" title="Permalink to this code">¶</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/env python</span>
+<span class="c1"># -*- encoding: utf-8 -*-</span>
+
+<span class="c1"># from gevent import monkey</span>
+<span class="c1"># monkey.patch_all()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">main function for calendar_bot</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">from</span> <span class="nn">daemonize</span> <span class="k">import</span> <span class="n">Daemonize</span>
+<span class="kn">from</span> <span class="nn">tornado.options</span> <span class="k">import</span> <span class="n">define</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">from</span> <span class="nn">calendar_bot.calendar_bot</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">calendar_bot.settings</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<span class="n">define</span><span class="p">(</span><span class="s2">&quot;daemonize&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;daemon mode&quot;</span><span class="p">)</span>
+<span class="n">define</span><span class="p">(</span><span class="s2">&quot;pidfile&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">CALENDAR_PID_FILE</span><span class="p">,</span>
+       <span class="n">help</span><span class="o">=</span><span class="s2">&quot;the path of pid file, default None&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">parse_command_line</span><span class="p">()</span>
+
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGPIPE</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIG_IGN</span><span class="p">)</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">sig_handler</span><span class="p">)</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGQUIT</span><span class="p">,</span> <span class="n">sig_handler</span><span class="p">)</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">sig_handler</span><span class="p">)</span>
+    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGHUP</span><span class="p">,</span> <span class="n">sig_handler</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">daemonize</span><span class="p">:</span>
+        <span class="n">daemon</span> <span class="o">=</span> <span class="n">Daemonize</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="s2">&quot;calendar_bot&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">start_calendar_bot</span><span class="p">,</span>
+                           <span class="n">pid</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">pidfile</span><span class="p">)</span>
+        <span class="n">daemon</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">start_calendar_bot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.calendar_bot.</code><code class="sig-name descname">start_calendar_bot</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>the calendar_bot launch code</p>
+<p>tornado.httpserver a non-blocking, single-threaded HTTP server.
+reference: <a class="reference external" href="https://www.tornadoweb.org/en/stable/httpserver.html">https://www.tornadoweb.org/en/stable/httpserver.html</a></p>
+<p>tornado.routing flexible routing implementation.
+reference: <a class="reference external" href="https://www.tornadoweb.org/en/stable/routing.html">https://www.tornadoweb.org/en/stable/routing.html</a></p>
+<p>If you use the event loop that comes with tornado, many third-party
+packages based on asyncio may not be used, such as aioredis.</p>
+<p>Message bot API overview.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/3005001?lang=en">https://developers.worksmobile.com/jp/document/3005001?lang=en</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.router.</code><code class="sig-name descname">getRouter</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>get the app with route info
+reference: <a class="reference external" href="https://www.tornadoweb.org/en/stable/web.html">https://www.tornadoweb.org/en/stable/web.html</a></p>
+<p>StaticFileHandler is a simple handler that can serve static content
+from a directory.
+reference: <a class="reference external" href="https://www.tornadoweb.org/en/stable/web.html#tornado.web.StaticFileHandler">https://www.tornadoweb.org/en/stable/web.html#tornado.web.StaticFileHandler</a></p>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="sig-prename descclassname">calendar_bot.callbackHandler.</code><code class="sig-name descname">CallbackHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span></dt>
+<dd><p>Process business requests of users.</p>
+<p>tornado.web.RequestHandler base class for HTTP request handlers.
+reference: <a class="reference external" href="https://www.tornadoweb.org/en/stable/web.html">https://www.tornadoweb.org/en/stable/web.html</a></p>
+<dl class="method">
+<dt>
+<code class="sig-name descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Implement the handle to corresponding HTTP method.
+Check also: calendar_bot/router.py</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="sig-prename descclassname">calendar_bot.check_and_handle_actions.</code><code class="sig-name descname">CheckAndHandleActions</code></dt>
+<dd><p>Factory used to create handler and execute handler.</p>
+<dl class="method">
+<dt>
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">body</em><span class="sig-paren">)</span></dt>
+<dd><p>Verify the body parameter and execute handler.
+Please refer to the reference link of the function.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100500901?lang=en">https://developers.worksmobile.com/jp/document/100500901?lang=en</a></p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="util-functions">
+<h2>util functions<a class="headerlink" href="#util-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.model.data.</code><code class="sig-name descname">make_text</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">i18n_texts=None</em><span class="sig-paren">)</span></dt>
+<dd><p>make text.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100500801?lang=en">https://developers.worksmobile.com/jp/document/100500801?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>text content.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.model.data.</code><code class="sig-name descname">make_quick_reply</code><span class="sig-paren">(</span><em class="sig-param">replay_items</em><span class="sig-paren">)</span></dt>
+<dd><p>Create quick reply message.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100500807?lang=en">https://developers.worksmobile.com/jp/document/100500807?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>replay_items</strong> – Array of return object of make_quick_reply_item function.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>quick reply content.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.model.data.</code><code class="sig-name descname">make_image_carousel</code><span class="sig-paren">(</span><em class="sig-param">columns</em><span class="sig-paren">)</span></dt>
+<dd><p>Image Carousel:
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100500809?lang=en">https://developers.worksmobile.com/jp/document/100500809?lang=en</a></p>
+<p>Request URL
+<a class="reference external" href="https://apis.worksmobile.com/r">https://apis.worksmobile.com/r</a>/{API ID}/message/v1/bot/{botNo}/message/push</p>
+<p>POST (Content-Type: application / json; charset = UTF-8)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>columns</strong> – image carousel columns</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>image carousel content</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.send_message.</code><code class="sig-name descname">push_message</code><span class="sig-paren">(</span><em class="sig-param">account_id</em>, <em class="sig-param">content</em>, <em class="sig-param">header=None</em><span class="sig-paren">)</span></dt>
+<dd><p>Send message to user. the package is the following JSON structure.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/1005008?lang=en">https://developers.worksmobile.com/jp/document/1005008?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>account_id</strong> – user account id</p></li>
+<li><p><strong>content</strong> – message content</p></li>
+<li><p><strong>header</strong> – http header</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="calender-functions">
+<h2>calender functions<a class="headerlink" href="#calender-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.calendar_req.</code><code class="sig-name descname">create_calendar</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>create calender.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100702701?lang=en">https://developers.worksmobile.com/jp/document/100702701?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>calendar id.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.calendar_req.</code><code class="sig-name descname">create_schedule</code><span class="sig-paren">(</span><em class="sig-param">current</em>, <em class="sig-param">end</em>, <em class="sig-param">begin</em>, <em class="sig-param">account_id</em>, <em class="sig-param">title</em><span class="sig-paren">)</span></dt>
+<dd><p>create schedule.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100702703?lang=en">https://developers.worksmobile.com/jp/document/100702703?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>schedule id.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.calendar_req.</code><code class="sig-name descname">modify_schedule</code><span class="sig-paren">(</span><em class="sig-param">calendar_uid</em>, <em class="sig-param">current</em>, <em class="sig-param">end</em>, <em class="sig-param">begin</em>, <em class="sig-param">account_id</em>, <em class="sig-param">title</em><span class="sig-paren">)</span></dt>
+<dd><p>modify schedule.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100702704?lang=en">https://developers.worksmobile.com/jp/document/100702704?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>schedule id.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="rich-menu-functions">
+<h2>rich menu functions<a class="headerlink" href="#rich-menu-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.richmenu.</code><code class="sig-name descname">upload_content</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span></dt>
+<dd><p>Upload rich menu background picture.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/1005025?lang=en">https://developers.worksmobile.com/jp/document/1005025?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> – resource local path</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>resource id</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.richmenu.</code><code class="sig-name descname">make_add_rich_menu_body</code><span class="sig-paren">(</span><em class="sig-param">rich_menu_name</em><span class="sig-paren">)</span></dt>
+<dd><p>add rich menu body
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100504001?lang=en">https://developers.worksmobile.com/jp/document/100504001?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rich_menu_name</strong> – rich menu name</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>rich menu id</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.richmenu.</code><code class="sig-name descname">set_rich_menu_image</code><span class="sig-paren">(</span><em class="sig-param">resource_id</em>, <em class="sig-param">rich_menu_id</em><span class="sig-paren">)</span></dt>
+<dd><p>Set a rich menu image.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100504002?lang=en">https://developers.worksmobile.com/jp/document/100504002?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_id</strong> – resource id</p></li>
+<li><p><strong>rich_menu_id</strong> – rich menu id</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.richmenu.</code><code class="sig-name descname">set_user_specific_rich_menu</code><span class="sig-paren">(</span><em class="sig-param">rich_menu_id</em>, <em class="sig-param">account_id</em><span class="sig-paren">)</span></dt>
+<dd><p>Set a user-specific rich menu.
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100504010?lang=en">https://developers.worksmobile.com/jp/document/100504010?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rich_menu_id</strong> – rich menu id</p></li>
+<li><p><strong>account_id</strong> – user account id</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.richmenu.</code><code class="sig-name descname">get_rich_menus</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Get rich menus
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100504004?lang=en">https://developers.worksmobile.com/jp/document/100504004?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>rich menu list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.externals.richmenu.</code><code class="sig-name descname">cancel_user_specific_rich_menu</code><span class="sig-paren">(</span><em class="sig-param">account_id</em><span class="sig-paren">)</span></dt>
+<dd><p>Cancel a user-specific rich menu
+reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/100504012?lang=en">https://developers.worksmobile.com/jp/document/100504012?lang=en</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>account_id</strong> – user account id</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="token-functions">
+<h2>token functions<a class="headerlink" href="#token-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.common.token.</code><code class="sig-name descname">create_tmp_token</code><span class="sig-paren">(</span><em class="sig-param">key_path</em>, <em class="sig-param">server_id</em><span class="sig-paren">)</span></dt>
+<dd><p>This function use JWT protocol to creates a temporary token
+for user authentication.</p>
+<p>Focus on the “Server Token (ID Registration Style)” section of
+the following documents.</p>
+<p>reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/1002002?lang=en">https://developers.worksmobile.com/jp/document/1002002?lang=en</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="sig-prename descclassname">calendar_bot.common.token.</code><code class="sig-name descname">generate_token</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Using JWT protocol to create token.
+Focus on the “Server Token (ID Registration Style)” section of
+the following documents.</p>
+<p>reference: <a class="reference external" href="https://developers.worksmobile.com/jp/document/1002002?lang=en">https://developers.worksmobile.com/jp/document/1002002?lang=en</a></p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autoapi/calendar_bot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/calendar_bot/index.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/actions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.actions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/common/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.common</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/externals/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.externals</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/model/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.model</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/calendar_bot/index.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/calendar_bot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.calendar_bot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/callbackHandler/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.callbackHandler</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/check_and_handle_actions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.check_and_handle_actions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/constant/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.constant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/contextlog/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.contextlog</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/initDB/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.initDB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/registerBot/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.registerBot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/router/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.router</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/calendar_bot/settings/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">calendar_bot.settings</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">calendar_bot</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, worksmobile.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
