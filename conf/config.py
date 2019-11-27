@@ -6,7 +6,7 @@ import os
 TZone = "Asia/Tokyo"
 
 # account
-ADMIN_ACCOUNT = "admin@lwbottest04.com"
+ADMIN_ACCOUNT = "admin@lwbottest04"
 DOMAIN_ID = 153499
 
 # api
