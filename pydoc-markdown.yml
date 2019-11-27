@@ -1,0 +1,10 @@
+loaders:
+  - type: python
+    modules: [attendance_management_bot]
+    search_path: [.]
+processors:
+  - type: pydocmd
+  - type: filter
+    document_only: true
+renderer:
+  type: markdown
