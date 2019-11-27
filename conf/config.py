@@ -6,22 +6,22 @@ import os
 TZone = "Asia/Tokyo"
 
 # account
-ADMIN_ACCOUNT = "admin@xxx.com"
-DOMAIN_ID = 0
+ADMIN_ACCOUNT = "admin@lwbottest04.com"
+DOMAIN_ID = 153499
 
 # api
-API_ID = "kr1EHxxxxfJVz"
-SERVER_CONSUMER_KEY = "To8SnC7sxxxxxjqXZhO"
+API_ID = "kr1hLBbxHJiDs"
+SERVER_CONSUMER_KEY = "cqRT31EkE5TFcSZCkIzt"
 
-SERVER_ID = "96460cc1e778402xxxxxfe35fa97ce76"
-SECRET_KEY_NAME = "private_201xxxxx164308.key"
+SERVER_ID = "c2d6d1eb148b4144a9f75abe49faece0"
+SECRET_KEY_NAME = "private_20191127124751.key"
 
 # LOCAL ADDRESS
-LOCAL_ADDRESS = "https://[Heroku app name].herokuapp.com/"
+LOCAL_ADDRESS = "https://pm191127samplebot.herokuapp.com/"
 
 # DB config
-DB_HOST = "ec2-xxx-xxx-xxx-xxx.compute-1.amazonaws.com"
-DB_NAME = "x3mdxxxxsg5nx"
-DB_USER = "xsozxxxxvksikx"
+DB_HOST = "ec2-54-235-248-185.compute-1.amazonaws.com"
+DB_NAME = "d948ducpbs8to4"
+DB_USER = "irxbslbpfagcyw"
 DB_PORT = "5432"
-DB_PASSWORD = "xxxxxb3ff80c85d331da880f4b3e0xxxxxxxxxxxd552d64d128317653ce0xxxx"
+DB_PASSWORD = "4484cc1abc190bd1bc9c46da75ff2f67df260963ee3e87f0eb7fd2eecd3942d3"
