@@ -6,9 +6,21 @@ Attendance management bot creates events with the clock-in and clock-out times s
 * Tornado framework
 * Postgres
 
+## How to use
+
+1. Get API authentication information from the Developers Console
+2. Develop your bot by using the sample bot source code provided on GitHub
+3. Deploy your bot depending on your company’s deployment policies
+
 ## Documentation
-See the official API documentation for more information
+See the official API documentation for more information.
 
 * English
 * Japanese
 * Korean
+
+## Reference
+* 
+
+## Furthur Inquiries
+Kindly leave a comment on Github Issues. 
