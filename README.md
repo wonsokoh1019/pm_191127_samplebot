@@ -20,7 +20,7 @@ See the official API documentation for more information.
 * Korean
 
 ## Reference
-* 
+* [Click here](https://pages.oss.navercorp.com/works-mobile/oneapp_samplebot_attendance_management_bot/index.html#) to see details on the attendance management bot source code.
 
 ## Furthur Inquiries
 Kindly leave a comment on Github Issues. 
