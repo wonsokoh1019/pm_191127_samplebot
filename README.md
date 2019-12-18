@@ -1,37 +1,14 @@
-# attendance_management_bot
-### reference information
-#### ref: http://www.tornadoweb.org
-####      https://minzkraut.com/2016/11/23/making-a-simple-spritesheet-generator-in-python
-### The default deployment path is ~/oneapp_samplebot_attendance_management_bot/attendance_management_bot, and if you want to change the deployment path, please modify the configuration file
-#### setting.py
-### Using the default irteam user to boot by default 
-### python version 3.6.3
+# Attendance management bot
+Attendance management bot creates events with the clock-in and clock-out times specified by users in the administrator's shared calendar. As all users' clock-in and clock-out events are created in the administrator's account connected with the bot, only authorized users can see those events.
 
-1. install miniconda3(python3.6 env) to ~/miniconda3; add ~/miniconda3/bin to $PATH;
-   refer https://conda.io/miniconda.html 
-   
-2. install the modules in requirements.txt to python3
-   refer https://pip.pypa.io/en/stable/user_guide/#installing-packages
+## Development Language and Environment
+* Python 3
+* Tornado framework
+* Postgres
 
-3. clone this repository
-    https://oss.navercorp.com/works-mobile/oneapp_samplebot_calendar.git
+## Documentation
+See the official API documentation for more information
 
-4. modify conf/config.py
-
-5. sh autoInit.sh
-
-6. simple running
-   python main.py --port=8080 --daemonize True
-
-# document
-[here](https://pages.oss.navercorp.com/works-mobile/oneapp_samplebot_attendance_management_bot/)
-```
-cd doc/
-
-make markdown
-ls _build/markdown/
-
-make html
-sphinx-serve
-cp -R _build/html/* ../docs/
-```
+* English
+* Japanese
+* Korean
